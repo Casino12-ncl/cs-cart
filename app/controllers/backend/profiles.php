@@ -818,4 +818,4 @@ if ($mode === 'get_manager_list') {
     Tygh::$app['ajax']->assign('total_objects', isset($params['total_items']) ? $params['total_items'] : count($objects));
 
     return[CONTROLLER_STATUS_NO_CONTENT];
-}
+} 
