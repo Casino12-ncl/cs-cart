@@ -32,6 +32,9 @@
                         data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
                     />
                 </th>
+                <td>
+                <a class="cm-ajax" href="{"`$c_url`&sort_by=position&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("position")}{if $search.sort_by === "position"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
+                </td>
                 <th><a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("name")}{if $search.sort_by === "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
                 <th width="15%"><a class="cm-ajax" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("creation_date")}{if $search.sort_by === "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
 
@@ -54,21 +57,19 @@
 
                 <td width="6%" class="left mobile-hide">
                     <input type="checkbox" name="units_ids[]" value="{$unit.unit_id}" class="cm-item {$no_hide_input} cm-item-status-{$unit.status|lower} hide" /></td>
+                    <td>
+                    <input type="text" name="units_data[{$unit.unit_id}][position]" value="{$unit.position}" size="3" class="input-micro input-hidden">
+                </td>
                 <td class="{$no_hide_input}" data-th="{__("name")}">
                     <a class="row-status" href="{"units.update?unit_id=`$unit.unit_id`"|fn_url}">{$unit.unit}</a>
                     {include file="views/companies/components/company_name.tpl" object=$unit}
                 </td>
-                <td width="10%" class="nowrap row-status {$no_hide_input} mobile-hide">
-                    {hook name="units:manage_banner_type"}
-                    {if $unit.type == "G"}{__("graphic_banner")}{else}{__("text_banner")}{/if}
-                    {/hook}
-                </td>
+                
                 <td width="15%" data-th="{__("creation_date")}">
                     {$unit.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                 </td>
 
-                {hook name="units:manage_data"}
-                {/hook}
+               
 
                 <td width="6%" class="mobile-hide">
                     {capture name="tools_list"}
