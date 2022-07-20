@@ -12,36 +12,98 @@ use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Tools\Url;
 use Tygh\Tygh;
+use Tygh\Languages\Languages;
 
 defined('BOOTSTRAP') or die('Access denied');
 
 $auth = & Tygh::$app['session']['auth'];
+$suffix = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {// if ($mode='add_unit' || $mode='update_unit') {
-    
-    } 
-    if ($mode === 'm_delete') {
-        if (!empty($_REQUEST['user_ids'])) {
-            foreach ($_REQUEST['user_ids'] as $v) {
-                fn_delete_user($v);
-            }
-        }
 
-        return array(CONTROLLER_STATUS_OK, 'units.manage' . (isset($_REQUEST['user_type']) ? '?user_type=' . $_REQUEST['user_type'] : '' ));
-    }
-    if($mode='update_unit' || $mode = 'add_unit') {
-        
-    }
-     if($mode='manage_units') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
+{
+    $suffix = '';
+    fn_trusted_vars(
+        'unit_data',
+        'update_unit',
+        'unit_id',
+        'manage_units',
+        'user_id',
+        'user_info',
+        'unit_ids',
+        'u_info'
+
        
-        list($units, $search) = fn_get_units($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
+    );
+        if($mode == 'update_unit') {
+            $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] :0;
+            $data = !empty($_REQUEST['unit_data']) ? $_REQUEST['unit_data'] : [];
+            $unit_id = fn_update_unit($data, $unit_id);
+           if (!empty($unit_id)) {
+            $suffix = ".update_unit?unit_id={$unit_id}";
+           } else $suffix = ".add_unit";
     
-   // fn_print_die($units);
-   
+        } elseif($mode == 'update_units') {
+            if (!empty($_REQUEST['units_data'])){
+                foreach ($_REQUEST['units_data'] as $unit_id => $data) {
+                    fn_update_unit($data, $unit_id);
+                }
+            }
+                $suffix = ".manage_units";
+            
+        } elseif($mode == 'delete_unit') {
+            $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] :0;
+            fn_delete_unit($unit_id);
+            $suffix = ".manage_units";
+        } elseif($mode == 'delete_units') {
+           
+            if (!empty($_REQUEST['unit_ids'])) {
+                foreach($_REQUEST['units_ids'] as $unit_id){
+                    fn_delete_unit($unit_id); 
+                }
+            }
+            $suffix = ".manage_units";
+        }
+    
+    return [CONTROLLER_STATUS_OK, 'units' . $suffix];
+}
+     if($mode=='update_unit' || $mode == 'add_unit') {
+         $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] : 0;
+         $unit_data = fn_get_unit_data($unit_id, DESCR_SL);
+         
+    
+     if (empty($unit_data) && $mode == 'update') {
+         return [CONTROLLER_STATUS_NO_PAGE];
+     }
+    
+     Tygh::$app['view']->assign([
+        'unit_data' => $unit_data,
+        'u_info' => !empty($unit_data['user_info']) ? fn_get_user_info($unit_data['user_info']) : [],
+        'us_info' => !empty($unit_data['user_info']) ? fn_get_user_info($unit_data['user_info']) : [],
+        
+    ]);    
+     }
+     
+  if($mode =='manage_units') {
+    
+        list($units, $search) = fn_get_units($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
+          
     Tygh::$app['view']->assign('units', $units);
     Tygh::$app['view']->assign('search', $search);
      }
 
+    function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
+    {
+        $unit = [];
+        if (!empty($unit_id)){
+            list($units) = fn_get_units([
+                'unit_id' => $unit_id
+                
+            ], 1, $lang_code);
+            $unit = !empty($units) ? reset($units) : [];
+        }
+        return $unit;
+    }
      
     function fn_get_units($params = array(),  $items_per_page = 0, $lang_code = CART_LANGUAGE)
     {
@@ -58,11 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {// if ($mode='add_unit' || $mode='up
         }
 
         $sortings = array(
-            'position' => '?:units.position',
+            'position'  => '?:units.position',
             'timestamp' => '?:units.timestamp',
-            'name' => '?:unit_descriptions.unit',
-            
-            'status' => '?:units.status',
+            'name'      => '?:unit_descriptions.unit',
+            'status'    => '?:units.status',
         );
 
         $condition = $limit = $join = '';
@@ -73,34 +134,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {// if ($mode='add_unit' || $mode='up
 
         $sorting = db_sort($params, $sortings, 'name', 'asc');
 
-       
-       
         if (!empty($params['item_ids'])) {
             $condition .= db_quote(' AND ?:units.unit_id IN (?n)', explode(',', $params['item_ids']));
         }
-
        
-
-        
+        if (!empty($params['unit_id'])) {
+            $condition .= db_quote(' AND ?:units.unit_id = ?i', $params['unit_id']);
+        }
 
         if (!empty($params['status'])) {
             $condition .= db_quote(' AND ?:units.status = ?s', $params['status']);
         }
 
-       
-
         $fields = array (
-            '?:units.unit_id',
-            '?:units.position',
-            '?:units.status',
-            '?:units.timestamp',
-            '?:unit_descriptions.unit',
-            '?:unit_descriptions.description',
-                       
+            '?:units.*',
+            '?:unit_descriptions.*'
         );
 
        
-
         $join .= db_quote(' LEFT JOIN ?:unit_descriptions ON ?:unit_descriptions.unit_id = ?:units.unit_id AND ?:unit_descriptions.lang_code = ?s', $lang_code);
        
         if (!empty($params['items_per_page'])) {
@@ -117,15 +168,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {// if ($mode='add_unit' || $mode='up
 
         
 
-        //$banner_image_ids = array_column($units, 'banner_image_id');
-       // $images = fn_get_image_pairs($banner_image_ids, 'promo', 'M', true, false, $lang_code);
+    $unit_image_ids = array_keys($units);
+    $images = fn_get_image_pairs($unit_image_ids, 'unit', 'M', true, false, $lang_code);
 
-        // foreach ($units as $unit_id => $unit) {
-        //     $units[$unit_id]['main_pair'] = !empty($images[$banner['banner_image_id']]) ? reset($images[$banner['banner_image_id']]) : array();
-        // }
-
+        foreach ($units as $unit_id => $unit) {
+            $units[$unit_id]['main_pair'] = !empty($images[$unit_id]) ? reset($images[$unit_id]) : array();
+        }
         
 
         return array($units, $params);
     }
-     
+
+    function fn_update_unit($data, $unit_id, $lang_code = DESCR_SL) 
+    {  
+
+        if (isset($data['timestamp'])) {
+            $data['timestamp'] = fn_parse_date($data['timestamp']);
+        }
+
+        
+
+        if (!empty($unit_id)) {
+            db_query("UPDATE ?:units SET ?u WHERE unit_id = ?i", $data, $unit_id);
+            db_query("UPDATE ?:unit_descriptions SET ?u WHERE unit_id = ?i AND lang_code = ?s", $data, $unit_id, $lang_code);
+        
+        
+
+        } else {
+            $unit_id = $data['unit_id'] = db_replace_into('units', $data);
+            
+
+            foreach (Languages::getAll() as $data['lang_code'] => $v) {
+                db_query("REPLACE INTO ?:unit_descriptions ?e", $data);
+            }
+        }
+        if (!empty($unit_id)) {
+            fn_attach_image_pairs('unit', 'unit', $unit_id, $lang_code);
+        }
+        // fn_print_die($data);
+        return $unit_id;
+    }
+    function fn_delete_unit($unit_id)
+    {
+    if (!empty($unit_id)) {
+        $res = db_query('DELETE FROM ?:units WHERE unit_id = ?i', $unit_id);
+        db_query('DELETE FROM ?:unit_descriptions WHERE unit_id = ?i', $unit_id);
+    }
+    }

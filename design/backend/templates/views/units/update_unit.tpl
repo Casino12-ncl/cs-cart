@@ -18,23 +18,41 @@
                 <div class="controls">
                 <input type="text" name="unit_data[unit]" id="elm_banner_name" value="{$unit_data.unit}" size="25" class="input-large" />
                 </div>
-            </div>
-            <div class="control-group">
-                <label for="elm_banner_name" class="control-label cm-required">{_("Руководитель")}</label>
-                <div class="controls">
-                <input type="text" name="unit_data[boss]" id="elm_banner_name" value="{$unit_data.boss}" size="25" class="input-large" />
-                </div>
-            </div>
-            <div class="control-group">
-                <label for="elm_banner_name" class="control-label cm-required">{_("Сотрудник")}</label>
-                <div class="controls">
-                <input type="text" name="unit_data[slave]" id="elm_banner_name" value="{$unit_data.slave}" size="25" class="input-large" />
-                </div>
-            </div>
+            </div>         
+          
 
-            
-
-            
+             <div class="control-group">
+        <label class="control-label">{_("Руководитель")}</label>
+        <div class="controls">
+            {include 
+            file="pickers/users/picker.tpl" 
+            but_text=_("Добавить\поменять руководителя") 
+            data_id="return_users" 
+            but_meta="btn" 
+            input_name="$unit_data[user_id]" 
+            item_ids=$unit_data.user_id 
+            placement="right"
+            display = "radio"
+            view_mode = "single_button"
+            user_info=$u_info}
+        </div>
+        <label class="control-label">{_("Сотрудники")}</label>
+        <div class="controls">
+            <div class="pull-left">
+            {include 
+            file="pickers/users/picker.tpl" 
+            but_text=_("Добавить сотрудников") 
+            data_id="return_users" 
+            but_meta="btn" 
+            input_name="$unit_data[slave_id]" 
+            item_ids=$unit_data.slave_id 
+            placement="right"
+            type = "radio"            
+            user_info=$us_info}
+            </div>
+        </div>
+        </div>
+        
 
             <div class="control-group" id="banner_graphic">
                 <label class="control-label">{__("image")}</label>
@@ -50,41 +68,55 @@
                 </div>
             </div>
 
-            <div class="control-group {if $b_type == "G"}hidden{/if}" id="banner_text">
-                <label class="control-label" for="elm_banner_description">{__("description")}:</label>
-                <div class="controls">
-                    <textarea id="elm_banner_description" name="$unit_data[description]" cols="35" rows="8" class="cm-wysiwyg input-large">{$unit_data.description}</textarea>
-                </div>
+           <div class="control-group" id="banner_text">
+            <label class="control-label" for="elm_banner_description">{__("description")}:</label>
+            <div class="controls">
+                <textarea id="elm_banner_description" 
+                name="unit_data[description]" 
+                cols="35" rows="8" class="cm-wysiwyg 
+                input-large">{$unit_data.description}
+                </textarea>
             </div>
+        </div>
 
+           <div class="control-group">
+            <label class="control-label" for="elm_banner_timestamp_{$id}">{__("creation_date")}</label>
+            <div class="controls">
+            {include file="common/calendar.tpl" 
+            date_id="elm_banner_timestamp_`$id`" 
+            date_name="unit_data[timestamp]" 
+            date_val=$unit_data.timestamp|default:$smarty.const.TIME 
+            start_year=$settings.Company.company_start_year}
+            </div>
+        </div>   
             
-
-            
-
-            <div class="control-group">
-                <label class="control-label" for="elm_banner_timestamp_{$id}">{__("creation_date")}</label>
-                <div class="controls">
-                {include file="common/calendar.tpl" date_id="elm_banner_timestamp_`$id`" date_name="$unit_data[timestamp]" date_val=$unit_data.timestamp|default:$smarty.const.TIME start_year=$settings.Company.company_start_year}
-                </div>
-            </div>    
-            {include file="common/select_status.tpl" input_name="unit_data[status]" id="elm_banner_status" obj_id=$id obj=unit_data hidden=false}
+            {include file="common/select_status.tpl" 
+            input_name="unit_data[status]" 
+            id="elm_unit_status" 
+            obj_id=$id 
+            obj=$unit_data 
+            hidden=false}
          
+   
+
         <!--content_general--></div>
 
-        <div id="content_addons" class="hidden clearfix">
-            {hook name="banners:detailed_content"}
-            {/hook}
-        <!--content_addons--></div>
+                
 
+               
         
 
 
     {capture name="buttons"}
         {if !$id}
-            {include file="buttons/save_cancel.tpl" but_role="submit-link" but_target_form="banners_form" but_name="dispatch[banners.update]"}
-        {else}
-            
-            {include file="buttons/save_cancel.tpl" but_name="dispatch[banners.update]" but_role="submit-link" but_target_form="banners_form" hide_first_button=$hide_first_button hide_second_button=$hide_second_button save=$id}
+            {include file="buttons/save_cancel.tpl" but_role="submit-link" but_target_form="banners_form" but_name="dispatch[units.update_unit]"}
+        {else}            
+            {include file="buttons/save_cancel.tpl" but_name="dispatch[units.update_unit]" but_role="submit-link" but_target_form="banners_form" hide_first_button=$hide_first_button hide_second_button=$hide_second_button save=$id}
+     
+                {capture name="tools_list"}
+                    <li>{btn type="list" text=__("delete") class="cm-confirm" href="units.delete_unit?unit_id=`$id`" method="POST"}</li>                      
+                {/capture}
+                {dropdown content=$smarty.capture.tools_list}          
         {/if}
 {/capture}
 

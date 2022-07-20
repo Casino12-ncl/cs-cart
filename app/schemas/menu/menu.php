@@ -508,11 +508,15 @@ $schema = [
         'customers' => [
             'title' => __('customers_menu_title'),
             'items' => [
+                'units' => [
+                    'href' => 'units.manage_units',                   
+                    'position' => 100,
+                ],
                 'administrators' => [
                     'href' => 'profiles.manage?user_type=A',
                     'alt' => 'profiles.update?user_type=A',
                     'position' => 200,
-                ],
+                ],                
                 'customers' => [
                     'href' => 'profiles.manage?user_type=C',
                     'alt' => 'profiles.update?user_type=C',
