@@ -36,8 +36,12 @@
                                 />
                             </th>
                             <th>
+                                Logo
+                            </th>
+                            <th>
                                 <a class="cm-ajax" href="{"`$c_url`&sort_by=position&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("position")}{if $search.sort_by === "position"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
                             </th>
+                           
                             <th>
                                 <a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("name")}{if $search.sort_by === "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
                             </th>
@@ -48,6 +52,7 @@
                             <th width="10%" class="right"><a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("status")}{if $search.sort_by === "status"}{$c_icon nofilter}{/if}</a></th>
                         </tr>
                         </thead>
+
                         {foreach from=$units item=unit}
                         <tr class="cm-row-status-{$unit.status|lower} ">
                             {$allow_save=true}
@@ -60,6 +65,18 @@
                             <td width="6%" class="left mobile-hide">
                                 <input type="checkbox" name="units_ids[]" value="{$unit.unit_id}" class="cm-item {$no_hide_input} cm-item-status-{$unit.status|lower} " />
                             </td>
+                            
+                            <td width="{$image_width + 18px}" class="products-list__image">
+                                {include
+                                    file="common/image.tpl"
+                                    image=$unit.main_pair.icon|default:$unit.main_pair.detailed
+                                    image_id=$unit.main_pair.image_id
+                                    image_width=50px
+                                    image_height=50px
+                                    image_css_class="products-list__image--img"
+                                    link_css_class="products-list__image--link"
+                                 }
+                         </td>  
                             <td>
                                 <input type="text" name="units_data[{$unit.unit_id}][position]" value="{$unit.position}" size="3" class="input-micro">
                             </td>
@@ -71,18 +88,25 @@
                                 {$unit.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                             </td>
 
-                            <th width="6%" class="mobile-hide">
+                            <td width="6%" class="mobile-hide">
                                 {capture name="tools_list"}                                  
                                 {if $units}
-                                <li>{btn type="list" class="cm-confirm" text=_("Удалить")  href="units.delete_units?unit_id=`$id`" method="POST"}</li>          
+                                <li>{btn type="delete_selected" dispatch="dispatch[units.delete_units]" form="manage_units_form"}</li>          
                                 {/if}
                                 {/capture}
                                 <div class="hidden-tools">
                                     {dropdown content=$smarty.capture.tools_list}
                                 </div>
-                            </th>
+                            </td>
                             <td width="10%" class="right" data-th="{__("status")}">
-                                {include file="common/select_popup.tpl" id=$unit.unit_id status=$unit.status hidden=true object_id_name="$unit_id" table="units" popup_additional_class="`$no_hide_input` dropleft"}
+                            {include file="views/products/components/status_on_manage.tpl"
+                            id=$unit.unit_id
+                            status=$unit.status
+                            hidden=true
+                            object_id_name="unit_id"
+                            table="units"
+                            non_editable_status=!fn_check_permissions("tools", "update_status", "admin", "POST", ["table" => "products"])
+                        }
                             </td>
                         </tr>
                         {/foreach}

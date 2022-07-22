@@ -16,43 +16,51 @@
             <div class="control-group">
                 <label for="elm_banner_name" class="control-label cm-required">{__("name")}</label>
                 <div class="controls">
-                <input type="text" name="unit_data[unit]" id="elm_banner_name" value="{$unit_data.unit}" size="25" class="input-large" />
+                <input type="text"
+                 name="unit_data[unit]"
+                 id="elm_banner_name" 
+                 value="{$unit_data.unit}" 
+                 size="25" 
+                 class="input-large" />
                 </div>
             </div>         
           
 
-             <div class="control-group">
-        <label class="control-label">{_("Руководитель")}</label>
-        <div class="controls">
-            {include 
-            file="pickers/users/picker.tpl" 
-            but_text=_("Добавить\поменять руководителя") 
-            data_id="return_users" 
-            but_meta="btn" 
-            input_name="$unit_data[user_id]" 
-            item_ids=$unit_data.user_id 
-            placement="right"
-            display = "radio"
-            view_mode = "single_button"
-            user_info=$u_info}
-        </div>
-        <label class="control-label">{_("Сотрудники")}</label>
-        <div class="controls">
-            <div class="pull-left">
-            {include 
-            file="pickers/users/picker.tpl" 
-            but_text=_("Добавить сотрудников") 
-            data_id="return_users" 
-            but_meta="btn" 
-            input_name="$unit_data[slave_id]" 
-            item_ids=$unit_data.slave_id 
-            placement="right"
-            type = "radio"            
-            user_info=$us_info}
-            </div>
-        </div>
-        </div>
-        
+                <div class="control-group">
+                    <label class="control-label">{__("users")}</label>
+            
+                    <div class="controls">
+                     {* {$unit_data|fn_print_die}  *}
+                        {include 
+                        file="pickers/users/picker.tpl"                         
+                        ut_meta="btn" 
+                        data_id="return_users" 
+                        but_text=__("add_recipients_from_users")             
+                        input_name="unit_data[user_id]" 
+                        item_ids=$unit_data.user_id
+                        user_name="unit_data[boss_name]"
+                        display = "radio"
+                        placement="left"
+                        view_mode = "single_button"
+                        user_info=$boss_info
+                        }
+                    </div>
+                 </div> 
+            
+                <div class="control-group">
+                    <label class="control-label">{__("users")}</label>
+                    <div class="controls">       
+                        {include
+                        file="pickers/users/picker.tpl"
+                        data_id="return_users" 
+                        but_text=__("add_recipients_from_users")  
+                        but_meta="btn"                  
+                        input_name="unit_data.users" 
+                        item_ids=$users
+                        user_info=$worker_info                                            
+                        }
+                    </div>
+                </div> 
 
             <div class="control-group" id="banner_graphic">
                 <label class="control-label">{__("image")}</label>

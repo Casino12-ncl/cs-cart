@@ -1,8 +1,6 @@
 
 <?php
 
-
-
 use Tygh\Api;
 use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ObjectStatuses;
@@ -31,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         'user_id',
         'user_info',
         'unit_ids',
-        'u_info'
+        'u_info',
+        'users'
 
        
     );
@@ -57,7 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
             $suffix = ".manage_units";
         } elseif($mode == 'delete_units') {
            
-            if (!empty($_REQUEST['unit_ids'])) {
+        //    fn_print_die($_REQUEST);
+           
+            if (!empty($_REQUEST['units_ids'])) {
                 foreach($_REQUEST['units_ids'] as $unit_id){
                     fn_delete_unit($unit_id); 
                 }
@@ -75,11 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
      if (empty($unit_data) && $mode == 'update') {
          return [CONTROLLER_STATUS_NO_PAGE];
      }
-    
+   // fn_print_die($unit_data.users); 
      Tygh::$app['view']->assign([
         'unit_data' => $unit_data,
-        'u_info' => !empty($unit_data['user_info']) ? fn_get_user_info($unit_data['user_info']) : [],
-        'us_info' => !empty($unit_data['user_info']) ? fn_get_user_info($unit_data['user_info']) : [],
+        'boss_info' =>   !empty(fn_get_user_info($unit_data['user_id'], DESCR_SL)) ? fn_get_user_info($unit_data['user_id'], DESCR_SL) : [],
+        'worker_info' => !empty(fn_get_user_info($unit_data['user_id'], DESCR_SL)) ? fn_get_user_info($unit_data['user_id'], DESCR_SL) : [],
+        
         
     ]);    
      }
@@ -120,10 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         }
 
         $sortings = array(
+            'image'     => '?:units.image_ids',
             'position'  => '?:units.position',
             'timestamp' => '?:units.timestamp',
             'name'      => '?:unit_descriptions.unit',
             'status'    => '?:units.status',
+            
         );
 
         $condition = $limit = $join = '';
@@ -145,10 +149,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         if (!empty($params['status'])) {
             $condition .= db_quote(' AND ?:units.status = ?s', $params['status']);
         }
-
-        $fields = array (
-            '?:units.*',
-            '?:unit_descriptions.*'
+        
+        $fields = array (            
+            '?:units.*',            
+            '?:unit_descriptions.*',
         );
 
        
@@ -168,8 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 
         
 
-    $unit_image_ids = array_keys($units);
-    $images = fn_get_image_pairs($unit_image_ids, 'unit', 'M', true, false, $lang_code);
+     $unit_image_ids = array_keys($units);
+        $images = fn_get_image_pairs($unit_image_ids, 'unit', 'M', true, false, $lang_code);
 
         foreach ($units as $unit_id => $unit) {
             $units[$unit_id]['main_pair'] = !empty($images[$unit_id]) ? reset($images[$unit_id]) : array();
