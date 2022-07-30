@@ -1,8 +1,7 @@
 
 {if $units}
 
-    {script src="js/tygh/exceptions.js"}
-    
+    {script src="js/tygh/exceptions.js"}    
 
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
@@ -14,8 +13,7 @@
         {split data=$units size=$columns|default:"2" assign="splitted_units" skip_complete=true}
     {/if}
 
-    {math equation="100 / x" x=$columns|default:"2" assign="cell_width"}
-    
+    {math equation="100 / x" x=$columns|default:"2" assign="cell_width"}    
 
     {* FIXME: Don't move this file *}
     {script src="js/tygh/product_image_gallery.js"}
@@ -33,6 +31,7 @@
                             <div class="ty-grid-list__item ty-quick-view-button__wrapper">
                             
                                     <div class="ty-grid-list__image">
+                          
                                         <a href="{"units.unit?unit_id={$unit.unit_id}"|fn_url}">
                                             {include 
                                             file="common/image.tpl" 
@@ -46,10 +45,11 @@
                                     </div>
 
                                     <div class="ty-grid-list__item-name">
-                                        <bdi>
-                                        {* {$unit|fn_print_die}                          *}
-                                            <a href="{"units.unit?unit_id={$unit.unit_id}"|fn_url}" class="product-title" title="{$unit.unit}">{$unit.unit}</a>    
-                                            {$unit.user_id}</a>    
+                                        <bdi>                                        
+                                            <a href="{"units.unit?unit_id={$unit.unit_id}"|fn_url}" class="product-title" title="{$unit.unit}">{$unit.unit}</a>                                             
+                                          Руководитель<br>
+                                           {$unit.lastname}<br>
+                                           {$unit.firstname}
                                         </bdi>
                                     </div>
                             </div>
@@ -59,6 +59,7 @@
                
             {/foreach}
         {/strip}
+         
     </div>
 
     {if !$no_pagination}

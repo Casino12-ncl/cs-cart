@@ -17,7 +17,6 @@ defined('BOOTSTRAP') or die('Access denied');
 $auth = & Tygh::$app['session']['auth'];
 $suffix = '';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
     $suffix = '';
@@ -29,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         'user_id',
         'user_info',
         'unit_ids',
-        'u_info',
+        'boss_info',
+        'worker_info',
+        'firstname',
         'users'
 
        
@@ -56,8 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
             $suffix = ".manage_units";
         } elseif($mode == 'delete_units') {
            
-        //    fn_print_die($_REQUEST);
-           
             if (!empty($_REQUEST['units_ids'])) {
                 foreach($_REQUEST['units_ids'] as $unit_id){
                     fn_delete_unit($unit_id); 
@@ -76,15 +75,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
      if (empty($unit_data) && $mode == 'update') {
          return [CONTROLLER_STATUS_NO_PAGE];
      }
-   // fn_print_die($unit_data.users); 
+     if ($mode='picker'){   
+  
      Tygh::$app['view']->assign([
+        
         'unit_data' => $unit_data,
-        'boss_info' =>   !empty(fn_get_user_info($unit_data['user_id'], DESCR_SL)) ? fn_get_user_info($unit_data['user_id'], DESCR_SL) : [],
-        'worker_info' => !empty(fn_get_user_info($unit_data['user_id'], DESCR_SL)) ? fn_get_user_info($unit_data['user_id'], DESCR_SL) : [],
+        'boss_info' =>   !empty($unit_data['user_id']) ? fn_get_user_short_info($unit_data['user_id'], DESCR_SL) : [],
+        'worker_info' => !empty($unit_data['user_id']) ? fn_get_user_short_info($unit_data['user_id'], DESCR_SL) : [],
         
         
     ]);    
      }
+    }
      
   if($mode =='manage_units') {
     
@@ -190,17 +192,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
             $data['timestamp'] = fn_parse_date($data['timestamp']);
         }
 
-        
-
         if (!empty($unit_id)) {
             db_query("UPDATE ?:units SET ?u WHERE unit_id = ?i", $data, $unit_id);
             db_query("UPDATE ?:unit_descriptions SET ?u WHERE unit_id = ?i AND lang_code = ?s", $data, $unit_id, $lang_code);
         
-        
-
         } else {
             $unit_id = $data['unit_id'] = db_replace_into('units', $data);
-            
 
             foreach (Languages::getAll() as $data['lang_code'] => $v) {
                 db_query("REPLACE INTO ?:unit_descriptions ?e", $data);

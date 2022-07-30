@@ -15,7 +15,18 @@
         {include_ext file="common/icon.tpl" class="icon-dummy" assign=c_dummy}
         {$banner_statuses=""|fn_get_default_statuses:true}
         {$has_permission = fn_check_permissions("units", "update_status", "admin", "POST")}
-
+               
+            {capture name="tools_list"}                                  
+            
+            <a data-ca-confirm-text="Будут удалены все выбранные отделы" 
+                class="cm-process-items cm-submit cm-confirm"
+                data-ca-target-form="units_form" 
+                data-ca-dispatch="dispatch[units.delete_units]"
+                Method = "POST">
+            Удалить все выбранные отделы
+            </a>                     
+            {/capture}                                
+                            
         {if $units}
             {capture name="units_table"}
                 <div class="table-responsive-wrapper longtap-selection">
@@ -36,7 +47,7 @@
                                 />
                             </th>
                             <th>
-                                Logo
+                                 <a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("logo")}{if $search.sort_by === "logo"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>                                
                             </th>
                             <th>
                                 <a class="cm-ajax" href="{"`$c_url`&sort_by=position&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("position")}{if $search.sort_by === "position"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
@@ -45,14 +56,14 @@
                             <th>
                                 <a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("name")}{if $search.sort_by === "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
                             </th>
-                            <th width="15%"><a class="cm-ajax" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("creation_date")}{if $search.sort_by === "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+                            <th width="5%"><a href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("creation_date")}{if $search.sort_by === "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
 
                             
-                            <th width="6%" class="mobile-hide">&nbsp;</th>
-                            <th width="10%" class="right"><a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("status")}{if $search.sort_by === "status"}{$c_icon nofilter}{/if}</a></th>
+                            
+                            <th width="10%" class="right" ><a href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("status")}{if $search.sort_by === "status"}{$c_icon nofilter}{/if}</a></th>
                         </tr>
                         </thead>
-
+                        
                         {foreach from=$units item=unit}
                         <tr class="cm-row-status-{$unit.status|lower} ">
                             {$allow_save=true}
@@ -76,7 +87,7 @@
                                     image_css_class="products-list__image--img"
                                     link_css_class="products-list__image--link"
                                  }
-                         </td>  
+                            </td>  
                             <td>
                                 <input type="text" name="units_data[{$unit.unit_id}][position]" value="{$unit.position}" size="3" class="input-micro">
                             </td>
@@ -87,17 +98,7 @@
                             <td width="15%" data-th="{__("creation_date")}">
                                 {$unit.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                             </td>
-
-                            <td width="6%" class="mobile-hide">
-                                {capture name="tools_list"}                                  
-                                {if $units}
-                                <li>{btn type="delete_selected" dispatch="dispatch[units.delete_units]" form="manage_units_form"}</li>          
-                                {/if}
-                                {/capture}
-                                <div class="hidden-tools">
-                                    {dropdown content=$smarty.capture.tools_list}
-                                </div>
-                            </td>
+                            
                             <td width="10%" class="right" data-th="{__("status")}">
                             {include file="views/products/components/status_on_manage.tpl"
                             id=$unit.unit_id
@@ -106,7 +107,7 @@
                             object_id_name="unit_id"
                             table="units"
                             non_editable_status=!fn_check_permissions("tools", "update_status", "admin", "POST", ["table" => "products"])
-                        }
+                            }
                             </td>
                         </tr>
                         {/foreach}
@@ -138,13 +139,15 @@
 {capture name="adv_buttons"} 
     {include file="common/tools.tpl" tool_href="units.update_unit"}
 {/capture}
-   
 
-
-
-
-        
-       
+{capture name="sidebar"}
+    {hook name="units:manage_sidebar"}
+    {include 
+    file="common/saved_search.tpl"
+    dispatch="units.manage_units" view_type="units"}
+    {include file="views/units/units_search_form.tpl" dispatch="units.manage_units"}
+    {/hook}
+{/capture}
     </form>
 
 {/capture}

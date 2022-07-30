@@ -27,18 +27,18 @@
           
 
                 <div class="control-group">
-                    <label class="control-label">{__("users")}</label>
+                    <label class="control-label">{__("boss")}</label>
             
                     <div class="controls">
-                     {* {$unit_data|fn_print_die}  *}
+                    
+                     
                         {include 
                         file="pickers/users/picker.tpl"                         
-                        ut_meta="btn" 
+                        
                         data_id="return_users" 
-                        but_text=__("add_recipients_from_users")             
+                        but_text=__("add_admins_from_users")             
                         input_name="unit_data[user_id]" 
-                        item_ids=$unit_data.user_id
-                        user_name="unit_data[boss_name]"
+                        item_ids=$unit_data.user_id 
                         display = "radio"
                         placement="left"
                         view_mode = "single_button"
@@ -48,16 +48,17 @@
                  </div> 
             
                 <div class="control-group">
-                    <label class="control-label">{__("users")}</label>
+                    <label class="control-label">{__("worker")}</label>
                     <div class="controls">       
                         {include
                         file="pickers/users/picker.tpl"
                         data_id="return_users" 
-                        but_text=__("add_recipients_from_users")  
+                        but_text=__("add_workers_from_users")  
                         but_meta="btn"                  
-                        input_name="unit_data.users" 
-                        item_ids=$users
-                        user_info=$worker_info                                            
+                        input_name="unit_data[slave_id]" 
+                        item_ids=$unit_data.slave_id                        
+                        user_info=$worker_info     
+
                         }
                     </div>
                 </div> 
