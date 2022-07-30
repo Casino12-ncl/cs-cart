@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS cscart_unit_links (
   unit_id INT(11) unsigned NOT NULL default '0',
   user_id INT(11) unsigned NOT NULL default '0',
+  slave_id text(256) unsigned NOT NULL default '0',
   KEY (user_id),
   KEY (unit_id),
 PRIMARY KEY (unit_id, user_id)  

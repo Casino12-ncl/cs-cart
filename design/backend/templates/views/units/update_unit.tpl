@@ -105,16 +105,8 @@
             obj_id=$id 
             obj=$unit_data 
             hidden=false}
-         
-   
 
         <!--content_general--></div>
-
-                
-
-               
-        
-
 
     {capture name="buttons"}
         {if !$id}
@@ -132,7 +124,6 @@
 </form>
 
 {/capture}
-
 
 {include file="common/mainbox.tpl"
     title=($id) ? $unit_data.banner : _("Добавить новый отдел")

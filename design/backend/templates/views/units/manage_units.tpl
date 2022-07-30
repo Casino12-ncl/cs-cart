@@ -152,7 +152,6 @@
 
 {/capture}
 
-
 {hook name="units:manage_mainbox_params"}
     {$page_title = _("Отделы")}
     {$select_languages = true}

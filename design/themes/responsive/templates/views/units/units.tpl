@@ -47,7 +47,7 @@
                                     <div class="ty-grid-list__item-name">
                                         <bdi>                                        
                                             <a href="{"units.unit?unit_id={$unit.unit_id}"|fn_url}" class="product-title" title="{$unit.unit}">{$unit.unit}</a>                                             
-                                          Руководитель<br>
+                                            Руководитель<br>
                                            {$unit.lastname}<br>
                                            {$unit.firstname}
                                         </bdi>
@@ -56,16 +56,11 @@
                         {/if}
                     </div>
                 {/foreach}
-               
             {/foreach}
         {/strip}
-         
     </div>
-
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
     {/if}
-
 {/if}
-
 {capture name="mainbox_title"}{$title}{/capture}
