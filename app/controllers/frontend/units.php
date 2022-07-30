@@ -167,9 +167,7 @@ function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
             $condition .= db_quote(' AND ?:units.unit_id = ?i', $params['unit_id']);
         }
        
-        // if (!empty($params['user_id'])) {
-        //     $condition .= db_quote(' AND ?:units.user_id = ?i', $params['user_id']);
-        // }
+        
 
         if (!empty($params['status'])) {
             $condition .= db_quote(' AND ?:units.status = ?s', $params['status']);
