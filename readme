@@ -6,6 +6,11 @@
  Поставить бэкап БД 
  по картинкам не уверен, что они будут
  логин и пароль от админки в файле config.local.php
+ $config['db_host'] = 'localhost';
+$config['db_name'] = 'cscart';
+$config['db_user'] = 'root';
+$config['db_password'] = 'maricas12';
+логин\пароль от админки - istomin_84@mail.ru
  по БД - 
     user_id - id руководителя
     unit - название отдела
