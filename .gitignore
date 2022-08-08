@@ -3,7 +3,7 @@ design/backend/css/twitterbootstrap.css
 images/*
 !**/images/
 !images/.gitkeep
-users/*
+
 var/*
 !var/database/.gitkeep
 !var/themes_repository
