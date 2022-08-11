@@ -1,15 +1,7 @@
 
 <?php
 
-use Tygh\Api;
-use Tygh\Enum\NotificationSeverity;
-use Tygh\Enum\ObjectStatuses;
-use Tygh\Enum\SiteArea;
-use Tygh\Enum\UserTypes;
-use Tygh\Enum\YesNo;
 use Tygh\Registry;
-use Tygh\Tools\Url;
-use Tygh\Tygh;
 use Tygh\Languages\Languages;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -32,18 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         'worker_info',
         'firstname',
         'users'
-
-       
     );
-        if($mode == 'update_unit') {
+        if($mode === 'update_unit') {
             $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] :0;
             $data = !empty($_REQUEST['unit_data']) ? $_REQUEST['unit_data'] : [];
             $unit_id = fn_update_unit($data, $unit_id);
-           if (!empty($unit_id)) {
+            if (!empty($unit_id)) {
             $suffix = ".update_unit?unit_id={$unit_id}";
-           } else $suffix = ".add_unit";
+            } else $suffix = ".add_unit";
     
-        } elseif($mode == 'update_units') {
+        } elseif($mode ==='update_units') {
             if (!empty($_REQUEST['units_data'])){
                 foreach ($_REQUEST['units_data'] as $unit_id => $data) {
                     fn_update_unit($data, $unit_id);
@@ -51,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
             }
                 $suffix = ".manage_units";
             
-        } elseif($mode == 'delete_unit') {
+        } elseif($mode === 'delete_unit') {
             $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] :0;
             fn_delete_unit($unit_id);
             $suffix = ".manage_units";
@@ -67,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
     
     return [CONTROLLER_STATUS_OK, 'units' . $suffix];
 }
-    if($mode=='update_unit' || $mode == 'add_unit') {
+    if($mode ==='update_unit' || $mode === 'add_unit') {
         $unit_id = !empty($_REQUEST['unit_id']) ? $_REQUEST['unit_id'] : 0;
         $unit_data = fn_get_unit_data($unit_id, DESCR_SL);
         
 
-    if (empty($unit_data) && $mode == 'update') {
+    if (empty($unit_data) && $mode === 'update') {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
     if ($mode='picker'){   
@@ -92,9 +82,9 @@ if($mode =='manage_units') {
 
     list($units, $search) = fn_get_units($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
         
-Tygh::$app['view']->assign('units', $units);
-Tygh::$app['view']->assign('search', $search);
-    }
+    Tygh::$app['view']->assign('units', $units);
+    Tygh::$app['view']->assign('search', $search);
+}
 
 function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
 {
@@ -109,7 +99,7 @@ function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
     return $unit;
 }
     
-function fn_get_units($params = array(),  $items_per_page = 0, $lang_code = CART_LANGUAGE)
+function fn_get_units($params = [],  $items_per_page = 0, $lang_code = CART_LANGUAGE)
 {
     // Set default values to input params
     $default_params = array(
@@ -165,9 +155,9 @@ function fn_get_units($params = array(),  $items_per_page = 0, $lang_code = CART
     }
 
     $units = db_get_hash_array(
-        "SELECT ?p FROM ?:units " .
+        'SELECT ?p FROM ?:units' .
         $join .
-        "WHERE 1 ?p ?p ?p",
+        'WHERE 1 ?p ?p ?p',
         'unit_id', implode(', ', $fields), $condition, $sorting, $limit
     );
 
@@ -201,8 +191,7 @@ function fn_update_unit($data, $unit_id, $lang_code = DESCR_SL)
     }
     if (!empty($unit_id)) {
         fn_attach_image_pairs('unit', 'unit', $unit_id, $lang_code);
-    }
-    // fn_print_die($data);
+    }    
     return $unit_id;
 }
 function fn_delete_unit($unit_id)
