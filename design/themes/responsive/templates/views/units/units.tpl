@@ -47,7 +47,7 @@
                                     <div class="ty-grid-list__item-name">
                                         <bdi>                                        
                                             <a href="{"units.unit?unit_id={$unit.unit_id}"|fn_url}" class="product-title" title="{$unit.unit}">{$unit.unit}</a>                                             
-                                            Руководитель<br>
+                                            {__('boss')}<br>
                                            {$unit.lastname}<br>
                                            {$unit.firstname}
                                         </bdi>

@@ -1,7 +1,15 @@
 
 <?php
 
+use Tygh\Api;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
+use Tygh\Tools\Url;
+use Tygh\Tygh;
 use Tygh\Languages\Languages;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -201,3 +209,4 @@ if (!empty($unit_id)) {
     db_query('DELETE FROM ?:unit_descriptions WHERE unit_id = ?i', $unit_id);
 }
 }
+

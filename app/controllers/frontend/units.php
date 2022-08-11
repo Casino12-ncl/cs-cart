@@ -1,29 +1,8 @@
 <?php
 
-use Illuminate\Support\Collection;
-use Tygh\Enum\NotificationSeverity;
-use Tygh\Enum\ObjectStatuses;
-use Tygh\Enum\OrderStatuses;
-use Tygh\Enum\ProfileDataTypes;
-use Tygh\Enum\ProfileFieldLocations;
-use Tygh\Enum\ProfileFieldSections;
-use Tygh\Enum\ProfileFieldTypes;
-use Tygh\Enum\ProfileTypes;
-use Tygh\Enum\SiteArea;
-use Tygh\Enum\UsergroupLinkStatuses;
-use Tygh\Enum\UsergroupStatuses;
-use Tygh\Enum\UsergroupTypes;
-use Tygh\Enum\UserTypes;
-use Tygh\Exceptions\DeveloperException;
-use Tygh\Http;
 use Tygh\Languages\Languages;
-use Tygh\Location\Manager;
-use Tygh\Navigation\LastView;
-use Tygh\Storage;
-use Tygh\Tools\SecurityHelper;
-use Tygh\Enum\YesNo;
 use Tygh\Registry;
-use Tygh\Tools\Url;
+
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -174,7 +153,10 @@ function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
         '?:users.lastname'
     );
     
-    $join .= db_quote(' LEFT JOIN ?:unit_descriptions ON ?:unit_descriptions.unit_id = ?:units.unit_id AND ?:unit_descriptions.lang_code = ?s', $lang_code);
+    $join .= db_quote(' LEFT JOIN ?:unit_descriptions     
+        ON ?:unit_descriptions.unit_id = ?:units.unit_id 
+        AND ?:unit_descriptions.lang_code = ?s',
+        $lang_code);
     $join .= db_quote(' LEFT JOIN ?:users ON ?:users.user_id = ?:units.user_id ');
     
     if (!empty($params['items_per_page'])) 
@@ -201,42 +183,11 @@ function fn_get_unit_data($unit_id=0, $lang_code = CART_LANGUAGE)
     return array($units, $params);
 }
 
-function fn_update_unit($data, $unit_id, $lang_code = DESCR_SL) 
-{  
-
-    if (isset($data['timestamp'])) {
-        $data['timestamp'] = fn_parse_date($data['timestamp']);
-    }
-
-    if (!empty($unit_id)) 
-    {
-        db_query("UPDATE ?:units SET ?u WHERE unit_id = ?i", $data, $unit_id);
-        db_query("UPDATE ?:unit_descriptions SET ?u WHERE unit_id = ?i AND lang_code = ?s", $data, $unit_id, $lang_code);
-    
-    } else 
-    {
-        $unit_id = $data['unit_id'] = db_replace_into('units', $data);
-        foreach (Languages::getAll() as $data['lang_code'] => $v) {
-            db_query("REPLACE INTO ?:unit_descriptions ?e", $data);
-        }
-    }
-    if (!empty($unit_id)) {
-        fn_attach_image_pairs('unit', 'unit', $unit_id, $lang_code);
-    }
-    
-    return $unit_id;
-}
-function fn_delete_unit($unit_id)
-{
-    if (!empty($unit_id)) 
-    {
-        $res = db_query('DELETE FROM ?:units WHERE unit_id = ?i', $unit_id);
-        db_query('DELETE FROM ?:unit_descriptions WHERE unit_id = ?i', $unit_id);
-    }
-}
-
 $boss_info = fn_get_user_short_info($unit_data['user_id']);
-$workers_info = db_get_fields("SELECT user_id FROM ?:users WHERE user_id IN(?n) ", explode ('.', $unit_data['slave_id']));
+$workers_info = db_get_fields("SELECT user_id 
+                FROM ?:users 
+                WHERE user_id IN(?n) ",
+                explode ('.', $unit_data['slave_id']));
 
 list($workers_info, $search) = fn_get_users($params, Registry::get('settings.Appearance.products_elements_per_page'), CART_LANGUAGE);
 
