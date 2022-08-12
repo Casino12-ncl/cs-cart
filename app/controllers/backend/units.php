@@ -209,4 +209,3 @@ if (!empty($unit_id)) {
     db_query('DELETE FROM ?:unit_descriptions WHERE unit_id = ?i', $unit_id);
 }
 }
-
