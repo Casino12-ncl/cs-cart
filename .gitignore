@@ -8,7 +8,7 @@ var/*
 !var/database/.gitkeep
 !var/themes_repository
 !var/resources
-!var/langs
+
 !var/conf
 !var/.htaccess
 !var/index.php
